@@ -35,91 +35,84 @@ public class DoctorControllerTest {
 
     @After
     public void cleanUp() {
-        doctorRepo.cleanAll();
+        doctorRepo.deleteAll();
 
     }
 
 
     @Test
     public void shouldFindAllDoctors() throws Exception {
-        doctorRepo.createDoctor(new Doctor(null, "Kirill", "sp1"));
-        doctorRepo.createDoctor(new Doctor(null, "Vasya", "sp2"));
-        doctorRepo.createDoctor(new Doctor(null, "Nikita", "sp3"));
+        doctorRepo.save(new Doctor(null, "Kirill", "doctor1"));
+        doctorRepo.save(new Doctor(null, "Vasya", "doctor2"));
+        doctorRepo.save(new Doctor(null, "Nikita", "doctor3"));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/doctors"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(fromResource("all-doctors.json"), false))
                 .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is("Kirill")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].specialization", Matchers.is("sp1")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].specialization", Matchers.is("doctor1")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].name", Matchers.is("Vasya")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].specialization", Matchers.is("sp2")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].specialization", Matchers.is("doctor2")));
     }
 
     @Test
     public void shouldReturnKirill() throws Exception {
-        doctorRepo.createDoctor(new Doctor(null, "Kirill", "sp1"));
-        doctorRepo.createDoctor(new Doctor(null, "Vasya", "sp2"));
-        doctorRepo.createDoctor(new Doctor(null, "Nikita", "sp3"));
+        doctorRepo.save(new Doctor(null, "Kirill", "doctor1"));
+        doctorRepo.save(new Doctor(null, "Vasya", "doctor2"));
+        doctorRepo.save(new Doctor(null, "Nikita", "doctor3"));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/doctors")
-                .param("specialization", "sp1"))
+                .param("specializations", "doctor1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].specialization", Matchers.is("sp1")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].specialization", Matchers.is("doctor1")));
     }
 
     @Test
     public void shouldReturnVasya() throws Exception {
-        doctorRepo.createDoctor(new Doctor(null, "Kirill", "sp1"));
-        doctorRepo.createDoctor(new Doctor(null, "Vasya", "sp2"));
-        doctorRepo.createDoctor(new Doctor(null, "Nikita", "sp3"));
+        doctorRepo.save(new Doctor(null, "Kirill", "doctor1"));
+        doctorRepo.save(new Doctor(null, "Vasya", "doctor2"));
+        doctorRepo.save(new Doctor(null, "Nikita", "doctor3"));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/doctors")
-                .param("name", "V")
-                .param("specialization", "sp2"))
+                .param("name", "Vasya")
+                .param("specializations", "doctor2"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].specialization", Matchers.is("sp2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].specialization", Matchers.is("doctor2")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is("Vasya")));
     }
 
     @Test
     public void shouldUpdateKirill() throws Exception {
-        Integer id = doctorRepo.createDoctor(new Doctor(null, "Kirill", "sp1")).getId();
+        Integer id = doctorRepo.save(new Doctor(null, "Kirill", "doctor1")).getId();
 
         mockMvc.perform(MockMvcRequestBuilders.put("/doctors/{id}", id)
                 .contentType("application/json")
                 .content(fromResource("update-doctor.json")))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
         Assertions.assertThat(doctorRepo.findById(id).get().getName()).isEqualTo("Roma");
-        Assertions.assertThat(doctorRepo.findById(id).get().getSpecialization()).isEqualTo("sp4");
+        Assertions.assertThat(doctorRepo.findById(id).get().getSpecialization()).isEqualTo("doctor3");
     }
 
-    @Test
-    public void shouldReturnNotFoundForUpdate() throws Exception {
-        Integer id = doctorRepo.createDoctor(new Doctor(null, "Kirill", "sp1")).getId();
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/doctors/{id}", id+1)
-                .contentType("application/json")
-                .content(fromResource("update-doctor.json")))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
     @Test
     public void shouldReturnNotFoundForDelete() throws Exception {
-        doctorRepo.createDoctor(new Doctor(null, "Kirill", "sp1"));
-        doctorRepo.createDoctor(new Doctor(null, "Vasya", "sp2"));
-        doctorRepo.createDoctor(new Doctor(null, "Nikita", "sp3"));
+        doctorRepo.save(new Doctor(null, "Kirill", "doctor1"));
+        doctorRepo.save(new Doctor(null, "Vasya", "doctor2"));
+        doctorRepo.save(new Doctor(null, "Nikita", "doctor3"));
+
         mockMvc.perform(MockMvcRequestBuilders.delete("/doctors/{id}", 4))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void shouldDeleteNikita() throws Exception {
-        doctorRepo.createDoctor(new Doctor(null, "Kirill", "sp1"));
-        doctorRepo.createDoctor(new Doctor(null, "Vasya", "sp2"));
-        doctorRepo.createDoctor(new Doctor(null, "Nikita", "sp3"));
-        mockMvc.perform(MockMvcRequestBuilders.delete("/doctors/{id}", 3))
+        doctorRepo.save(new Doctor(null, "Kirill", "doctor1"));
+        doctorRepo.save(new Doctor(null, "Vasya", "doctor2"));
+        Integer id = doctorRepo.save(new Doctor(null, "Nikita", "doctor3")).getId();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/doctors/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
         Assertions.assertThat(doctorRepo.findById(3)).isEmpty();
     }
@@ -130,10 +123,10 @@ public class DoctorControllerTest {
                 .contentType("application/json")
                 .content(fromResource("create-doctor.json")))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(header().string("location", containsString("http://localhost:8080/doctors/")))
+                .andExpect(header().string("location", containsString("http://my-doctor.com/doctors/")))
                 .andReturn().getResponse();
         Integer id = Integer.parseInt(response.getHeader("location")
-                .replace("http://localhost:8080/doctors/", ""));
+                .replace("http://my-doctor.com/doctors/", ""));
         Assertions.assertThat(doctorRepo.findById(id)).isPresent();
     }
 

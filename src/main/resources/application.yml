@@ -1,0 +1,17 @@
+server.port: 80
+
+doctors:
+  host-name: my-doctor.com
+  specializations:
+    - doctor1
+    - doctor2
+    - doctor3
+
+spring:
+  h2:
+    console:
+      enabled: true
+
+#server.port=80
+#doctors.host-name=my-doctor.com
+#spring.h2.console.enabled=true

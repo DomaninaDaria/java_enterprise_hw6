@@ -1,14 +1,14 @@
 [
   {
     "name": "Kirill",
-    "specialization": "sp1"
+    "specialization": "doctor1"
   },
   {
     "name": "Vasya",
-    "specialization": "sp2"
+    "specialization": "doctor2"
   },
   {
     "name": "Nikita",
-    "specialization": "sp3"
+    "specialization": "doctor3"
   }
 ]

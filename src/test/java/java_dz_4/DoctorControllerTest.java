@@ -98,6 +98,23 @@ public class DoctorControllerTest {
 
 
     @Test
+    public void shouldReturnNOtFoundSpecializationForCreateDoctor() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/doctors")
+                .contentType("application/json")
+                .content(fromResource("create-update-wrong-doctor.json")))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturnNOtFoundSpecializationForUpdateDoctor() throws Exception {
+        Integer id = doctorRepo.save(new Doctor(null, "Kirill", "doctor1")).getId();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/doctors/{id}", id)
+                .contentType("application/json")
+                .content(fromResource("create-update-wrong-doctor.json")))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+    @Test
     public void shouldReturnNotFoundForDelete() throws Exception {
         doctorRepo.save(new Doctor(null, "Kirill", "doctor1"));
         doctorRepo.save(new Doctor(null, "Vasya", "doctor2"));
